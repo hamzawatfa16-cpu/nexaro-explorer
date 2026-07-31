@@ -11,6 +11,8 @@ export component MainWindow inherits Window {
     in property <string> current_path: "This PC";
     in property <[UiBreadcrumb]> breadcrumbs;
     in-out property <string> sidebar_current: "Home";
+    in-out property <bool> sidebar_compact: false;
+    in property <int> selected_count: 0;
     in-out property <bool> rename_visible: false;
     in-out property <string> rename_text: "";
     in-out property <bool> delete_visible: false;
@@ -25,6 +27,7 @@ export component MainWindow inherits Window {
     callback navigate_music();
     callback navigate_videos();
     callback navigate_network();
+    callback toggle_sidebar();
     callback open_this_pc();
     callback open_folder(path: string);
     callback open_file(path: string);
@@ -72,6 +75,8 @@ export component MainWindow inherits Window {
         HorizontalLayout {
             Sidebar {
                 current: root.sidebar_current;
+                compact: root.sidebar_compact;
+                toggle => { root.toggle_sidebar(); }
 
                 home => { root.sidebar_current = "Home"; }
                 quick_access => { root.sidebar_current = "Quick Access"; }
@@ -122,7 +127,7 @@ export component MainWindow inherits Window {
 
         StatusBar {
             item_count: root.files.length;
-            selected_count: 0;
+            selected_count: root.selected_count;
         }
     }
 
