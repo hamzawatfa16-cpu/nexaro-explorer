@@ -15,8 +15,6 @@ export component MainWindow inherits Window {
     in-out property <string> rename_text: "";
     in-out property <bool> delete_visible: false;
     in-out property <string> delete_name: "";
-    in-out property <bool> context_visible: false;
-    in-out property <string> context_target: "";
 
     callback navigate_home();
     callback navigate_quick_access();
@@ -34,11 +32,6 @@ export component MainWindow inherits Window {
     callback go_back();
     callback go_forward();
     callback go_up();
-    callback context_rename();
-    callback context_delete();
-    callback context_copy();
-    callback context_cut();
-    callback context_new_folder();
 
     callback new_folder();
     callback open_documents();
@@ -124,10 +117,6 @@ export component MainWindow inherits Window {
                 select_file(path) => { root.select_file(path); }
                 open_folder(path) => { root.open_folder(path); }
                 open_file(path) => { root.open_file(path); }
-                show_menu(path) => {
-                    root.context_target = path;
-                    root.context_visible = true;
-                }
             }
         }
 
@@ -266,132 +255,6 @@ export component MainWindow inherits Window {
                             horizontal-alignment: center;
                             vertical-alignment: center;
                         }
-                    }
-                }
-            }
-        }
-    }
-
-    if (root.context_visible) : Rectangle {
-        background: #00000055;
-
-        TouchArea {
-            clicked => {
-                root.context_visible = false;
-            }
-        }
-
-        Rectangle {
-            width: 200px;
-            height: 228px;
-            background: Colors.content;
-            border-width: 1px;
-            border-color: #2d5f8f;
-            border-radius: 10px;
-            x: parent.width - self.width - 24px;
-            y: 90px;
-
-            VerticalLayout {
-                padding: 8px;
-                spacing: 4px;
-
-                Rectangle {
-                    height: 36px;
-                    border-radius: 8px;
-                    background: new_touch.has-hover ? #101d2d : Colors.content;
-
-                    new_touch := TouchArea {
-                        clicked => {
-                            root.context_visible = false;
-                            root.context_new_folder();
-                        }
-                    }
-
-                    Text {
-                        text: "📁 New folder";
-                        color: Colors.text;
-                        vertical-alignment: center;
-                        x: 12px;
-                    }
-                }
-
-                Rectangle {
-                    height: 36px;
-                    border-radius: 8px;
-                    background: rename_touch.has-hover ? #101d2d : Colors.content;
-
-                    rename_touch := TouchArea {
-                        clicked => {
-                            root.context_visible = false;
-                            root.context_rename();
-                        }
-                    }
-
-                    Text {
-                        text: "✏ Rename";
-                        color: Colors.text;
-                        vertical-alignment: center;
-                        x: 12px;
-                    }
-                }
-
-                Rectangle {
-                    height: 36px;
-                    border-radius: 8px;
-                    background: copy_touch.has-hover ? #101d2d : Colors.content;
-
-                    copy_touch := TouchArea {
-                        clicked => {
-                            root.context_visible = false;
-                            root.context_copy();
-                        }
-                    }
-
-                    Text {
-                        text: "📋 Copy";
-                        color: Colors.text;
-                        vertical-alignment: center;
-                        x: 12px;
-                    }
-                }
-
-                Rectangle {
-                    height: 36px;
-                    border-radius: 8px;
-                    background: cut_touch.has-hover ? #101d2d : Colors.content;
-
-                    cut_touch := TouchArea {
-                        clicked => {
-                            root.context_visible = false;
-                            root.context_cut();
-                        }
-                    }
-
-                    Text {
-                        text: "✂ Cut";
-                        color: Colors.text;
-                        vertical-alignment: center;
-                        x: 12px;
-                    }
-                }
-
-                Rectangle {
-                    height: 36px;
-                    border-radius: 8px;
-                    background: delete_touch.has-hover ? #3a1111 : Colors.content;
-
-                    delete_touch := TouchArea {
-                        clicked => {
-                            root.context_visible = false;
-                            root.context_delete();
-                        }
-                    }
-
-                    Text {
-                        text: "🗑 Delete";
-                        color: #ff8a8a;
-                        vertical-alignment: center;
-                        x: 12px;
                     }
                 }
             }
