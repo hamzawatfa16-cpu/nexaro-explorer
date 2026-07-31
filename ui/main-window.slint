@@ -11,12 +11,11 @@ export component MainWindow inherits Window {
     in property <string> current_path: "This PC";
     in property <[UiBreadcrumb]> breadcrumbs;
     in-out property <string> sidebar_current: "Home";
-    in-out property <bool> sidebar_compact: false;
-    in property <int> selected_count: 0;
     in-out property <bool> rename_visible: false;
     in-out property <string> rename_text: "";
     in-out property <bool> delete_visible: false;
     in-out property <string> delete_name: "";
+    in-out property <bool> context_visible: false;
 
     callback navigate_home();
     callback navigate_quick_access();
@@ -27,7 +26,6 @@ export component MainWindow inherits Window {
     callback navigate_music();
     callback navigate_videos();
     callback navigate_network();
-    callback toggle_sidebar();
     callback open_this_pc();
     callback open_folder(path: string);
     callback open_file(path: string);
@@ -35,6 +33,11 @@ export component MainWindow inherits Window {
     callback go_back();
     callback go_forward();
     callback go_up();
+    callback context_rename();
+    callback context_delete();
+    callback context_copy();
+    callback context_cut();
+    callback context_new_folder();
 
     callback new_folder();
     callback open_documents();
@@ -75,8 +78,6 @@ export component MainWindow inherits Window {
         HorizontalLayout {
             Sidebar {
                 current: root.sidebar_current;
-                compact: root.sidebar_compact;
-                toggle => { root.toggle_sidebar(); }
 
                 home => { root.sidebar_current = "Home"; }
                 quick_access => { root.sidebar_current = "Quick Access"; }
@@ -116,18 +117,10 @@ export component MainWindow inherits Window {
                 }
             }
 
-            FileList {
-                files: root.files;
-
-                select_file(path) => { root.select_file(path); }
-                open_folder(path) => { root.open_folder(path); }
-                open_file(path) => { root.open_file(path); }
-            }
-        }
-
+        
         StatusBar {
             item_count: root.files.length;
-            selected_count: root.selected_count;
+            selected_count: 0;
         }
     }
 
@@ -265,4 +258,131 @@ export component MainWindow inherits Window {
             }
         }
     }
-}
+
+    if (root.context_visible) : Rectangle {
+        background: #00000055;
+
+        TouchArea {
+            clicked => {
+                root.context_visible = false;
+            }
+        }
+
+        Rectangle {
+            width: 200px;
+            height: 228px;
+            background: Colors.content;
+            border-width: 1px;
+            border-color: #2d5f8f;
+            border-radius: 10px;
+            x: parent.width - self.width - 24px;
+            y: 90px;
+
+            VerticalLayout {
+                padding: 8px;
+                spacing: 4px;
+
+                Rectangle {
+                    height: 36px;
+                    border-radius: 8px;
+                    background: new_touch.has-hover ? #101d2d : Colors.content;
+
+                    new_touch := TouchArea {
+                        clicked => {
+                            root.context_visible = false;
+                            root.context_new_folder();
+                        }
+                    }
+
+                    Text {
+                        text: "📁 New folder";
+                        color: Colors.text;
+                        vertical-alignment: center;
+                        x: 12px;
+                    }
+                }
+
+                Rectangle {
+                    height: 36px;
+                    border-radius: 8px;
+                    background: rename_touch.has-hover ? #101d2d : Colors.content;
+
+                    rename_touch := TouchArea {
+                        clicked => {
+                            root.context_visible = false;
+                            root.context_rename();
+                        }
+                    }
+
+                    Text {
+                        text: "✏ Rename";
+                        color: Colors.text;
+                        vertical-alignment: center;
+                        x: 12px;
+                    }
+                }
+
+                Rectangle {
+                    height: 36px;
+                    border-radius: 8px;
+                    background: copy_touch.has-hover ? #101d2d : Colors.content;
+
+                    copy_touch := TouchArea {
+                        clicked => {
+                            root.context_visible = false;
+                            root.context_copy();
+                        }
+                    }
+
+                    Text {
+                        text: "📋 Copy";
+                        color: Colors.text;
+                        vertical-alignment: center;
+                        x: 12px;
+                    }
+                }
+
+                Rectangle {
+                    height: 36px;
+                    border-radius: 8px;
+                    background: cut_touch.has-hover ? #101d2d : Colors.content;
+
+                    cut_touch := TouchArea {
+                        clicked => {
+                            root.context_visible = false;
+                            root.context_cut();
+                        }
+                    }
+
+                    Text {
+                        text: "✂ Cut";
+                        color: Colors.text;
+                        vertical-alignment: center;
+                        x: 12px;
+                    }
+                }
+
+                Rectangle {
+                    height: 36px;
+                    border-radius: 8px;
+                    background: delete_touch.has-hover ? #3a1111 : Colors.content;
+
+                    delete_touch := TouchArea {
+                        clicked => {
+                            root.context_visible = false;
+                            root.context_delete();
+                        }
+                    }
+
+                    Text {
+                        text: "🗑 Delete";
+                        color: #ff8a8a;
+                        vertical-alignment: center;
+                        x: 12px;
+                    }
+                }
+            }
+        }
+    }
+    }
+    }
