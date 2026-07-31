@@ -6,11 +6,6 @@ import { FileList, UiFileItem } from "components/file-list.slint";
 import { StatusBar } from "components/status-bar.slint";
 import { LineEdit } from "std-widgets.slint";
 
-export struct UiBreadcrumb {
-    label: string,
-    path: string,
-}
-
 export component MainWindow inherits Window {
     in property <[UiFileItem]> files;
     in property <string> current_path: "This PC";
@@ -66,10 +61,8 @@ export component MainWindow inherits Window {
     height: 800px;
     background: Colors.window;
 
-    // Main Layout Stack
     VerticalLayout {
         Toolbar {
-            breadcrumb_clicked(path) => { root.breadcrumb_clicked(path); }
             current_path: root.current_path;
             breadcrumbs: root.breadcrumbs;
 
@@ -78,8 +71,9 @@ export component MainWindow inherits Window {
             up => { root.go_up(); }
             new_folder => { root.new_folder(); }
             rename => { root.rename_requested(); }
-            search_changed(query) => { root.search_changed(query); }
             delete_selected => { root.delete_selected(); }
+            search_changed(query) => { root.search_changed(query); }
+            breadcrumb_clicked(path) => { root.breadcrumb_clicked(path); }
         }
 
         HorizontalLayout {
@@ -130,6 +124,10 @@ export component MainWindow inherits Window {
                 select_file(path) => { root.select_file(path); }
                 open_folder(path) => { root.open_folder(path); }
                 open_file(path) => { root.open_file(path); }
+                show_menu(path) => {
+                    root.context_target = path;
+                    root.context_visible = true;
+                }
             }
         }
 
@@ -139,7 +137,6 @@ export component MainWindow inherits Window {
         }
     }
 
-    // Modal Overlays (Positioned relative to the whole Window)
     if (root.rename_visible) : Rectangle {
         background: #00000088;
 
@@ -149,6 +146,7 @@ export component MainWindow inherits Window {
             background: Colors.content;
             border-width: 1px;
             border-color: #2d5f8f;
+            border-radius: 10px;
             x: (parent.width - self.width) / 2;
             y: (parent.height - self.height) / 2;
 
@@ -172,6 +170,7 @@ export component MainWindow inherits Window {
                     Rectangle {
                         width: 80px;
                         height: 32px;
+                        border-radius: 8px;
                         background: #17304a;
 
                         TouchArea {
@@ -189,6 +188,7 @@ export component MainWindow inherits Window {
                     Rectangle {
                         width: 80px;
                         height: 32px;
+                        border-radius: 8px;
                         background: #101826;
 
                         TouchArea {
@@ -216,6 +216,7 @@ export component MainWindow inherits Window {
             background: Colors.content;
             border-width: 1px;
             border-color: #2d5f8f;
+            border-radius: 10px;
             x: (parent.width - self.width) / 2;
             y: (parent.height - self.height) / 2;
 
@@ -232,8 +233,9 @@ export component MainWindow inherits Window {
                     spacing: 8px;
 
                     Rectangle {
-                        width: 80px;
+                        width: 88px;
                         height: 32px;
+                        border-radius: 8px;
                         background: #3a1111;
 
                         TouchArea {
@@ -249,8 +251,9 @@ export component MainWindow inherits Window {
                     }
 
                     Rectangle {
-                        width: 80px;
+                        width: 88px;
                         height: 32px;
+                        border-radius: 8px;
                         background: #101826;
 
                         TouchArea {
@@ -279,13 +282,12 @@ export component MainWindow inherits Window {
         }
 
         Rectangle {
-            width: 180px;
-            height: 220px;
+            width: 200px;
+            height: 228px;
             background: Colors.content;
             border-width: 1px;
             border-color: #2d5f8f;
             border-radius: 10px;
-
             x: parent.width - self.width - 24px;
             y: 90px;
 
@@ -294,8 +296,8 @@ export component MainWindow inherits Window {
                 spacing: 4px;
 
                 Rectangle {
-                    height: 32px;
-                    border-radius: 6px;
+                    height: 36px;
+                    border-radius: 8px;
                     background: new_touch.has-hover ? #101d2d : Colors.content;
 
                     new_touch := TouchArea {
@@ -309,13 +311,13 @@ export component MainWindow inherits Window {
                         text: "📁 New folder";
                         color: Colors.text;
                         vertical-alignment: center;
-                        x: 10px;
+                        x: 12px;
                     }
                 }
 
                 Rectangle {
-                    height: 32px;
-                    border-radius: 6px;
+                    height: 36px;
+                    border-radius: 8px;
                     background: rename_touch.has-hover ? #101d2d : Colors.content;
 
                     rename_touch := TouchArea {
@@ -329,13 +331,13 @@ export component MainWindow inherits Window {
                         text: "✏ Rename";
                         color: Colors.text;
                         vertical-alignment: center;
-                        x: 10px;
+                        x: 12px;
                     }
                 }
 
                 Rectangle {
-                    height: 32px;
-                    border-radius: 6px;
+                    height: 36px;
+                    border-radius: 8px;
                     background: copy_touch.has-hover ? #101d2d : Colors.content;
 
                     copy_touch := TouchArea {
@@ -349,13 +351,13 @@ export component MainWindow inherits Window {
                         text: "📋 Copy";
                         color: Colors.text;
                         vertical-alignment: center;
-                        x: 10px;
+                        x: 12px;
                     }
                 }
 
                 Rectangle {
-                    height: 32px;
-                    border-radius: 6px;
+                    height: 36px;
+                    border-radius: 8px;
                     background: cut_touch.has-hover ? #101d2d : Colors.content;
 
                     cut_touch := TouchArea {
@@ -369,13 +371,13 @@ export component MainWindow inherits Window {
                         text: "✂ Cut";
                         color: Colors.text;
                         vertical-alignment: center;
-                        x: 10px;
+                        x: 12px;
                     }
                 }
 
                 Rectangle {
-                    height: 32px;
-                    border-radius: 6px;
+                    height: 36px;
+                    border-radius: 8px;
                     background: delete_touch.has-hover ? #3a1111 : Colors.content;
 
                     delete_touch := TouchArea {
@@ -389,7 +391,7 @@ export component MainWindow inherits Window {
                         text: "🗑 Delete";
                         color: #ff8a8a;
                         vertical-alignment: center;
-                        x: 10px;
+                        x: 12px;
                     }
                 }
             }
