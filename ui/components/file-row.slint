@@ -1,0 +1,45 @@
+import { Colors } from "../theme/colors.slint";
+
+export component FileRow inherits Rectangle {
+
+    in property <string> name;
+    in property <string> type;
+    in property <string> size;
+    in property <string> modified;
+
+    height: 34px;
+
+    background: Colors.content;
+
+    HorizontalLayout {
+
+        spacing: 0;
+
+        Text {
+            text: root.name;
+            color: Colors.text;
+            width: 350px;
+            vertical-alignment: center;
+        }
+
+        Text {
+            text: root.type;
+            color: Colors.text;
+            width: 170px;
+            vertical-alignment: center;
+        }
+
+        Text {
+            text: root.size;
+            color: Colors.text;
+            width: 120px;
+            vertical-alignment: center;
+        }
+
+        Text {
+            text: root.modified;
+            color: Colors.text;
+            vertical-alignment: center;
+        }
+    }
+}

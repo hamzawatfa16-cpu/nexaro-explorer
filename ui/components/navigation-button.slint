@@ -1,0 +1,24 @@
+import { Colors } from "../theme/colors.slint";
+
+export component NavigationButton inherits Rectangle {
+
+    in property <string> text;
+
+    width: 36px;
+    height: 36px;
+
+    border-radius: 8px;
+
+    background: Colors.sidebar;
+
+    Text {
+        text: root.text;
+        color: Colors.text;
+
+        horizontal-alignment: center;
+        vertical-alignment: center;
+
+        width: parent.width;
+        height: parent.height;
+    }
+}

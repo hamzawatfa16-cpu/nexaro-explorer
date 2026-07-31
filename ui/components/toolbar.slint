@@ -1,0 +1,213 @@
+import { Colors } from "../theme/colors.slint";
+import { LineEdit } from "std-widgets.slint";
+import { UiBreadcrumb } from "../shared/breadcrumbs.slint";
+
+component ToolButton inherits Rectangle {
+
+    in property <string> text;
+    callback clicked();
+
+    width: 34px;
+    height: 34px;
+
+    border-radius: 8px;
+
+    background: touch.pressed
+        ? #17304a
+        : (touch.has-hover ? #101d2d : Colors.toolbar);
+
+    touch := TouchArea {
+        clicked => { root.clicked(); }
+    }
+
+    Text {
+        text: root.text;
+        color: Colors.text;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+}
+
+component ActionButton inherits Rectangle {
+
+    in property <string> text;
+    callback clicked();
+
+    width: 88px;
+    height: 34px;
+
+    border-radius: 8px;
+
+    background: touch.pressed
+        ? #17304a
+        : (touch.has-hover ? #101d2d : Colors.toolbar);
+
+    touch := TouchArea {
+        clicked => { root.clicked(); }
+    }
+
+    Text {
+        text: root.text;
+        color: Colors.text;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+}
+
+export component Toolbar inherits Rectangle {
+    
+    in property <[UiBreadcrumb]> breadcrumbs;
+    in property <string> current_path: "This PC";
+
+    callback back();
+    callback forward();
+    callback up();
+    callback new_folder();
+    callback rename();
+    callback delete_selected();
+    callback search_changed(query: string);
+    callback breadcrumb_clicked(path: string);
+
+    height: 52px;
+    background: Colors.toolbar;
+
+    HorizontalLayout {
+
+        padding-left: 12px;
+        padding-right: 12px;
+        spacing: 8px;
+
+        ToolButton {
+         
+            text: "←";
+            clicked => { root.back(); }
+        }
+
+        ToolButton {
+        
+            text: "→";
+            clicked => { root.forward(); }
+        }
+
+        ToolButton {
+           
+            text: "↑";
+            clicked => { root.up(); }
+        }
+
+        Rectangle {
+            width: 1px;
+            height: 24px;
+            background: #2a3547;
+        }
+
+        ActionButton {
+            
+            text: "📁 New";
+            clicked => { root.new_folder(); }
+        }
+
+        ActionButton {
+          
+            text: "✏ Rename";
+            clicked => { root.rename(); }
+        }
+
+        ActionButton {
+          
+            text: "🗑 Delete";
+            clicked => { root.delete_selected(); }
+        }
+
+        Rectangle {
+            width: 1px;
+            height: 24px;
+            background: #2a3547;
+        }
+
+        Rectangle {
+
+            horizontal-stretch: 1;
+            height: 36px;
+
+            border-radius: 10px;
+            background: #101826;
+            border-width: 1px;
+            border-color: #243041;
+
+            HorizontalLayout {
+
+                padding-left: 12px;
+                padding-right: 12px;
+                spacing: 6px;
+
+                for crumb[i] in root.breadcrumbs : HorizontalLayout {
+
+                    spacing: 6px;
+
+                    Rectangle {
+                        height: 24px;
+                        border-radius: 6px;
+                        background: touch.has-hover ? #17304a : #101826;
+
+                        touch := TouchArea {
+                            clicked => {
+                                root.breadcrumb_clicked(crumb.path);
+                            }
+                        }
+
+                        Text {
+                            text: crumb.label;
+                            color: Colors.text;
+                            vertical-alignment: center;
+                            x: 8px;
+                            width: parent.width - 16px;
+                        }
+                    }
+
+                    if i < root.breadcrumbs.length - 1 : Text {
+                        text: "›";
+                        color: Colors.text;
+                        vertical-alignment: center;
+                    }
+                }
+            }
+        }
+
+        Rectangle {
+
+            width: 280px;
+            height: 36px;
+
+            border-radius: 10px;
+            background: #101826;
+            border-width: 1px;
+            border-color: #243041;
+
+            HorizontalLayout {
+
+                padding-left: 12px;
+                padding-right: 12px;
+                spacing: 8px;
+
+                Text {
+                    text: "🔍";
+                    color: Colors.text;
+                    vertical-alignment: center;
+                    width: 16px;
+                }
+
+                LineEdit {
+                    horizontal-stretch: 1;
+                    height: 20px;
+
+                    placeholder-text: "Search files";
+
+                    edited(text) => {
+                        root.search_changed(text);
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,398 @@
+import { Colors } from "theme/colors.slint";
+import { Toolbar } from "components/toolbar.slint";
+import { Sidebar } from "components/sidebar.slint";
+import { UiBreadcrumb } from "shared/breadcrumbs.slint";
+import { FileList, UiFileItem } from "components/file-list.slint";
+import { StatusBar } from "components/status-bar.slint";
+import { LineEdit } from "std-widgets.slint";
+
+export struct UiBreadcrumb {
+    label: string,
+    path: string,
+}
+
+export component MainWindow inherits Window {
+    in property <[UiFileItem]> files;
+    in property <string> current_path: "This PC";
+    in property <[UiBreadcrumb]> breadcrumbs;
+    in-out property <string> sidebar_current: "Home";
+    in-out property <bool> rename_visible: false;
+    in-out property <string> rename_text: "";
+    in-out property <bool> delete_visible: false;
+    in-out property <string> delete_name: "";
+    in-out property <bool> context_visible: false;
+    in-out property <string> context_target: "";
+
+    callback navigate_home();
+    callback navigate_quick_access();
+    callback navigate_this_pc();
+    callback navigate_documents();
+    callback navigate_downloads();
+    callback navigate_pictures();
+    callback navigate_music();
+    callback navigate_videos();
+    callback navigate_network();
+    callback open_this_pc();
+    callback open_folder(path: string);
+    callback open_file(path: string);
+
+    callback go_back();
+    callback go_forward();
+    callback go_up();
+    callback context_rename();
+    callback context_delete();
+    callback context_copy();
+    callback context_cut();
+    callback context_new_folder();
+
+    callback new_folder();
+    callback open_documents();
+    callback open_downloads();
+    callback open_pictures();
+    callback open_music();
+    callback open_videos();
+    callback rename_requested();
+    callback rename_confirmed(name: string);
+    callback rename_cancelled();
+    callback delete_selected();
+    callback search_changed(query: string);
+    callback select_file(path: string);
+    callback delete_confirmed();
+    callback delete_cancelled();
+    callback breadcrumb_clicked(path: string);
+
+    title: "Nexaro Explorer";
+    width: 1280px;
+    height: 800px;
+    background: Colors.window;
+
+    // Main Layout Stack
+    VerticalLayout {
+        Toolbar {
+            breadcrumb_clicked(path) => { root.breadcrumb_clicked(path); }
+            current_path: root.current_path;
+            breadcrumbs: root.breadcrumbs;
+
+            back => { root.go_back(); }
+            forward => { root.go_forward(); }
+            up => { root.go_up(); }
+            new_folder => { root.new_folder(); }
+            rename => { root.rename_requested(); }
+            search_changed(query) => { root.search_changed(query); }
+            delete_selected => { root.delete_selected(); }
+        }
+
+        HorizontalLayout {
+            Sidebar {
+                current: root.sidebar_current;
+
+                home => { root.sidebar_current = "Home"; }
+                quick_access => { root.sidebar_current = "Quick Access"; }
+
+                this_pc => {
+                    root.sidebar_current = "This PC";
+                    root.open_this_pc();
+                }
+
+                documents => {
+                    root.sidebar_current = "Documents";
+                    root.open_documents();
+                }
+
+                downloads => {
+                    root.sidebar_current = "Downloads";
+                    root.open_downloads();
+                }
+
+                pictures => {
+                    root.sidebar_current = "Pictures";
+                    root.open_pictures();
+                }
+
+                music => {
+                    root.sidebar_current = "Music";
+                    root.open_music();
+                }
+
+                videos => {
+                    root.sidebar_current = "Videos";
+                    root.open_videos();
+                }
+
+                network => {
+                    root.sidebar_current = "Network";
+                }
+            }
+
+            FileList {
+                files: root.files;
+
+                select_file(path) => { root.select_file(path); }
+                open_folder(path) => { root.open_folder(path); }
+                open_file(path) => { root.open_file(path); }
+            }
+        }
+
+        StatusBar {
+            item_count: root.files.length;
+            selected_count: 0;
+        }
+    }
+
+    // Modal Overlays (Positioned relative to the whole Window)
+    if (root.rename_visible) : Rectangle {
+        background: #00000088;
+
+        Rectangle {
+            width: 320px;
+            height: 140px;
+            background: Colors.content;
+            border-width: 1px;
+            border-color: #2d5f8f;
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
+
+            VerticalLayout {
+                padding: 16px;
+                spacing: 12px;
+
+                Text {
+                    text: "Rename";
+                    color: Colors.text;
+                }
+
+                LineEdit {
+                    text: root.rename_text;
+                    edited(t) => { root.rename_text = t; }
+                }
+
+                HorizontalLayout {
+                    spacing: 8px;
+
+                    Rectangle {
+                        width: 80px;
+                        height: 32px;
+                        background: #17304a;
+
+                        TouchArea {
+                            clicked => { root.rename_confirmed(root.rename_text); }
+                        }
+
+                        Text {
+                            text: "OK";
+                            color: Colors.text;
+                            horizontal-alignment: center;
+                            vertical-alignment: center;
+                        }
+                    }
+
+                    Rectangle {
+                        width: 80px;
+                        height: 32px;
+                        background: #101826;
+
+                        TouchArea {
+                            clicked => { root.rename_cancelled(); }
+                        }
+
+                        Text {
+                            text: "Cancel";
+                            color: Colors.text;
+                            horizontal-alignment: center;
+                            vertical-alignment: center;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if (root.delete_visible) : Rectangle {
+        background: #00000088;
+
+        Rectangle {
+            width: 320px;
+            height: 140px;
+            background: Colors.content;
+            border-width: 1px;
+            border-color: #2d5f8f;
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
+
+            VerticalLayout {
+                padding: 16px;
+                spacing: 12px;
+
+                Text {
+                    text: "Delete " + root.delete_name + "?";
+                    color: Colors.text;
+                }
+
+                HorizontalLayout {
+                    spacing: 8px;
+
+                    Rectangle {
+                        width: 80px;
+                        height: 32px;
+                        background: #3a1111;
+
+                        TouchArea {
+                            clicked => { root.delete_confirmed(); }
+                        }
+
+                        Text {
+                            text: "Delete";
+                            color: Colors.text;
+                            horizontal-alignment: center;
+                            vertical-alignment: center;
+                        }
+                    }
+
+                    Rectangle {
+                        width: 80px;
+                        height: 32px;
+                        background: #101826;
+
+                        TouchArea {
+                            clicked => { root.delete_cancelled(); }
+                        }
+
+                        Text {
+                            text: "Cancel";
+                            color: Colors.text;
+                            horizontal-alignment: center;
+                            vertical-alignment: center;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if (root.context_visible) : Rectangle {
+        background: #00000055;
+
+        TouchArea {
+            clicked => {
+                root.context_visible = false;
+            }
+        }
+
+        Rectangle {
+            width: 180px;
+            height: 220px;
+            background: Colors.content;
+            border-width: 1px;
+            border-color: #2d5f8f;
+            border-radius: 10px;
+
+            x: parent.width - self.width - 24px;
+            y: 90px;
+
+            VerticalLayout {
+                padding: 8px;
+                spacing: 4px;
+
+                Rectangle {
+                    height: 32px;
+                    border-radius: 6px;
+                    background: new_touch.has-hover ? #101d2d : Colors.content;
+
+                    new_touch := TouchArea {
+                        clicked => {
+                            root.context_visible = false;
+                            root.context_new_folder();
+                        }
+                    }
+
+                    Text {
+                        text: "📁 New folder";
+                        color: Colors.text;
+                        vertical-alignment: center;
+                        x: 10px;
+                    }
+                }
+
+                Rectangle {
+                    height: 32px;
+                    border-radius: 6px;
+                    background: rename_touch.has-hover ? #101d2d : Colors.content;
+
+                    rename_touch := TouchArea {
+                        clicked => {
+                            root.context_visible = false;
+                            root.context_rename();
+                        }
+                    }
+
+                    Text {
+                        text: "✏ Rename";
+                        color: Colors.text;
+                        vertical-alignment: center;
+                        x: 10px;
+                    }
+                }
+
+                Rectangle {
+                    height: 32px;
+                    border-radius: 6px;
+                    background: copy_touch.has-hover ? #101d2d : Colors.content;
+
+                    copy_touch := TouchArea {
+                        clicked => {
+                            root.context_visible = false;
+                            root.context_copy();
+                        }
+                    }
+
+                    Text {
+                        text: "📋 Copy";
+                        color: Colors.text;
+                        vertical-alignment: center;
+                        x: 10px;
+                    }
+                }
+
+                Rectangle {
+                    height: 32px;
+                    border-radius: 6px;
+                    background: cut_touch.has-hover ? #101d2d : Colors.content;
+
+                    cut_touch := TouchArea {
+                        clicked => {
+                            root.context_visible = false;
+                            root.context_cut();
+                        }
+                    }
+
+                    Text {
+                        text: "✂ Cut";
+                        color: Colors.text;
+                        vertical-alignment: center;
+                        x: 10px;
+                    }
+                }
+
+                Rectangle {
+                    height: 32px;
+                    border-radius: 6px;
+                    background: delete_touch.has-hover ? #3a1111 : Colors.content;
+
+                    delete_touch := TouchArea {
+                        clicked => {
+                            root.context_visible = false;
+                            root.context_delete();
+                        }
+                    }
+
+                    Text {
+                        text: "🗑 Delete";
+                        color: #ff8a8a;
+                        vertical-alignment: center;
+                        x: 10px;
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,15 @@
+[package]
+name = "Nexaro-Explorer"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+i-slint-backend-winit = "1.17.1"
+i-slint-renderer-skia = "1.17.1"
+notify = "8"
+slint = "1.17.1"
+chrono = "0.4"
+open = "5"
+dirs = "6"
+[build-dependencies]
+slint-build = "1"

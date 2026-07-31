@@ -1,0 +1,34 @@
+import { Colors } from "../theme/colors.slint";
+
+export component SidebarItem inherits Rectangle {
+
+    in property <string> text;
+    in property <bool> selected: false;
+
+    callback clicked();
+
+    height: 38px;
+
+    border-radius: 8px;
+
+    background: selected
+        ? #17304a
+        : (touch.has-hover ? #101d2d : Colors.sidebar);
+
+    touch := TouchArea {
+        clicked => { root.clicked(); }
+    }
+
+    HorizontalLayout {
+
+        padding-left: 12px;
+        padding-right: 12px;
+        spacing: 10px;
+
+        Text {
+            text: root.text;
+            color: Colors.text;
+            vertical-alignment: center;
+        }
+    }
+}

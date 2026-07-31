@@ -1,0 +1,34 @@
+import { Colors } from "../theme/colors.slint";
+
+export component StatusBar inherits Rectangle {
+
+    in property <int> item_count: 0;
+    in property <int> selected_count: 0;
+
+    height: 24px;
+
+    background: Colors.toolbar;
+
+    HorizontalLayout {
+
+        padding-left: 10px;
+        padding-right: 10px;
+
+        Text {
+            text: root.item_count + " items";
+            color: Colors.text;
+            vertical-alignment: center;
+        }
+
+        Rectangle {
+            horizontal-stretch: 1;
+            background: transparent;
+        }
+
+        Text {
+            text: root.selected_count + " selected";
+            color: Colors.text;
+            vertical-alignment: center;
+        }
+    }
+}

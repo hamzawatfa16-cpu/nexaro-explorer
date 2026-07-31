@@ -1,0 +1,175 @@
+import { Colors } from "../theme/colors.slint";
+
+export struct UiFileItem {
+    icon: string,
+    name: string,
+    path: string,
+    file_type: string,
+    size: string,
+    modified: string,
+}
+
+export component FileList inherits Rectangle {
+
+    in property <[UiFileItem]> files;
+
+    in-out property <int> selected_index: -1;
+
+    callback open_folder(path: string);
+    callback open_file(path: string);
+    callback select_file(path: string);
+    callback show_menu(path: string);
+
+    background: Colors.content;
+
+    VerticalLayout {
+
+        Rectangle {
+            height: 36px;
+            background: Colors.toolbar;
+
+            HorizontalLayout {
+
+                spacing: 0;
+                padding-left: 8px;
+                padding-right: 8px;
+
+                Text {
+                    text: "Name";
+                    color: Colors.text;
+                    width: 390px;
+                    vertical-alignment: center;
+                }
+
+                Text {
+                    text: "Type";
+                    color: Colors.text;
+                    width: 170px;
+                    vertical-alignment: center;
+                }
+
+                Text {
+                    text: "Size";
+                    color: Colors.text;
+                    width: 120px;
+                    vertical-alignment: center;
+                }
+
+                Text {
+                    text: "Modified";
+                    color: Colors.text;
+                    width: 180px;
+                    vertical-alignment: center;
+                }
+
+                Rectangle {
+                    width: 28px;
+                    height: 1px;
+                    background: Colors.toolbar;
+                }
+            }
+        }
+
+        for file[i] in root.files : Rectangle {
+
+            height: 42px;
+
+            background: i == root.selected_index
+                ? #17304a
+                : (touch.has-hover ? #101d2d : Colors.content);
+
+            border-width: 1px;
+            border-color: i == root.selected_index ? #3b82f6 : #00000000;
+
+            border-radius: 8px;
+
+            touch := TouchArea {
+                clicked => {
+                    root.selected_index = i;
+                    root.select_file(file.path);
+                }
+
+                double-clicked => {
+                    if (file.file_type == "Directory") {
+                        root.open_folder(file.path);
+                    } else {
+                        root.open_file(file.path);
+                    }
+                }
+            }
+
+            HorizontalLayout {
+
+                spacing: 0;
+                padding-left: 8px;
+                padding-right: 8px;
+
+                Rectangle {
+                    width: 40px;
+                    height: parent.height;
+                    background: #00000000;
+
+                    Text {
+                        text: file.icon;
+                        color: Colors.text;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+                }
+
+                Text {
+                    text: file.name;
+                    color: Colors.text;
+                    width: 350px;
+                    vertical-alignment: center;
+                    font-weight: 600;
+                }
+
+                Text {
+                    text: file.file_type;
+                    color: Colors.text;
+                    width: 170px;
+                    vertical-alignment: center;
+                }
+
+                Text {
+                    text: file.size;
+                    color: Colors.text;
+                    width: 120px;
+                    vertical-alignment: center;
+                }
+
+                Text {
+                    text: file.modified;
+                    color: Colors.text;
+                    width: 180px;
+                    vertical-alignment: center;
+                }
+
+                Rectangle {
+                    width: 28px;
+                    height: 28px;
+                    border-radius: 6px;
+                    background: menu_touch.has-hover ? #17304a : #00000000;
+
+                    menu_touch := TouchArea {
+                        clicked => {
+                            root.show_menu(file.path);
+                        }
+                    }
+
+                    Text {
+                        text: "⋮";
+                        color: Colors.text;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+                }
+            }
+        }
+
+        Rectangle {
+            background: Colors.content;
+        }
+    }
+}

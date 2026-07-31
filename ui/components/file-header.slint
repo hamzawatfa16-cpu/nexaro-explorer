@@ -1,0 +1,40 @@
+import { Colors } from "../theme/colors.slint";
+
+export component FileHeader inherits Rectangle {
+
+    height: 36px;
+
+    background: Colors.toolbar;
+
+    HorizontalLayout {
+
+        spacing: 0;
+
+        Text {
+            text: "Name";
+            color: Colors.text;
+            width: 350px;
+            vertical-alignment: center;
+        }
+
+        Text {
+            text: "Type";
+            color: Colors.text;
+            width: 170px;
+            vertical-alignment: center;
+        }
+
+        Text {
+            text: "Size";
+            color: Colors.text;
+            width: 120px;
+            vertical-alignment: center;
+        }
+
+        Text {
+            text: "Modified";
+            color: Colors.text;
+            vertical-alignment: center;
+        }
+    }
+}

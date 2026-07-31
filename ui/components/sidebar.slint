@@ -1,0 +1,86 @@
+import { Colors } from "../theme/colors.slint";
+import { SidebarItem } from "sidebar-item.slint";
+
+export component Sidebar inherits Rectangle {
+
+    callback home();
+    callback quick_access();
+    callback this_pc();
+    callback documents();
+    callback downloads();
+    callback pictures();
+    callback music();
+    callback videos();
+    callback network();
+
+    in property <string> current: "Home";
+
+    width: 210px;
+
+    background: Colors.sidebar;
+
+    VerticalLayout {
+
+        spacing: 4px;
+
+        padding: 10px;
+
+        SidebarItem {
+            text: "🏠 Home";
+            selected: root.current == "Home";
+            clicked => { root.home(); }
+        }
+
+        SidebarItem {
+            text: "⭐ Quick Access";
+            selected: root.current == "Quick Access";
+            clicked => { root.quick_access(); }
+        }
+
+        SidebarItem {
+            text: "🖥 This PC";
+            selected: root.current == "This PC";
+            clicked => { root.this_pc(); }
+        }
+
+        Rectangle { height: 8px; background: Colors.sidebar; }
+
+        SidebarItem {
+            text: "📄 Documents";
+            selected: root.current == "Documents";
+            clicked => { root.documents(); }
+        }
+
+        SidebarItem {
+            text: "⬇ Downloads";
+            selected: root.current == "Downloads";
+            clicked => { root.downloads(); }
+        }
+
+        SidebarItem {
+            text: "🖼 Pictures";
+            selected: root.current == "Pictures";
+            clicked => { root.pictures(); }
+        }
+
+        SidebarItem {
+            text: "🎵 Music";
+            selected: root.current == "Music";
+            clicked => { root.music(); }
+        }
+
+        SidebarItem {
+            text: "🎬 Videos";
+            selected: root.current == "Videos";
+            clicked => { root.videos(); }
+        }
+
+        Rectangle { height: 8px; background: Colors.sidebar; }
+
+        SidebarItem {
+            text: "🌐 Network";
+            selected: root.current == "Network";
+            clicked => { root.network(); }
+        }
+    }
+}

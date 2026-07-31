@@ -1,0 +1,23 @@
+import { Colors } from "../theme/colors.slint";
+
+export component SearchBox inherits Rectangle {
+
+    in property <string> placeholder: "Search files...";
+
+    min-width: 260px;
+    height: 36px;
+
+    border-radius: 8px;
+    background: Colors.sidebar;
+
+    Text {
+        x: 12px;
+        width: parent.width - 24px;
+        height: parent.height;
+
+        text: root.placeholder;
+        color: #808080;
+
+        vertical-alignment: center;
+    }
+}

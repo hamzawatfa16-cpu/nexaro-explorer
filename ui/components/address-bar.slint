@@ -1,0 +1,23 @@
+import { Colors } from "../theme/colors.slint";
+
+export component AddressBar inherits Rectangle {
+
+    in property <string> path: "This PC";
+
+    min-width: 450px;
+    height: 36px;
+
+    border-radius: 8px;
+    background: Colors.sidebar;
+
+    Text {
+        x: 12px;
+        width: parent.width - 24px;
+        height: parent.height;
+
+        text: root.path;
+        color: Colors.text;
+
+        vertical-alignment: center;
+    }
+}
