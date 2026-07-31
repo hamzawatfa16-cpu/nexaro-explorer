@@ -18,7 +18,6 @@ export component FileList inherits Rectangle {
     callback open_folder(path: string);
     callback open_file(path: string);
     callback select_file(path: string);
-    callback show_menu(path: string);
 
     background: Colors.content;
 
@@ -61,12 +60,6 @@ export component FileList inherits Rectangle {
                     width: 180px;
                     vertical-alignment: center;
                 }
-
-                Rectangle {
-                    width: 28px;
-                    height: 1px;
-                    background: Colors.toolbar;
-                }
             }
         }
 
@@ -80,7 +73,6 @@ export component FileList inherits Rectangle {
 
             border-width: 1px;
             border-color: i == root.selected_index ? #3b82f6 : #00000000;
-
             border-radius: 8px;
 
             touch := TouchArea {
@@ -144,26 +136,6 @@ export component FileList inherits Rectangle {
                     color: Colors.text;
                     width: 180px;
                     vertical-alignment: center;
-                }
-
-                Rectangle {
-                    width: 28px;
-                    height: 28px;
-                    border-radius: 6px;
-                    background: menu_touch.has-hover ? #17304a : #00000000;
-
-                    menu_touch := TouchArea {
-                        clicked => {
-                            root.show_menu(file.path);
-                        }
-                    }
-
-                    Text {
-                        text: "⋮";
-                        color: Colors.text;
-                        horizontal-alignment: center;
-                        vertical-alignment: center;
-                    }
                 }
             }
         }
