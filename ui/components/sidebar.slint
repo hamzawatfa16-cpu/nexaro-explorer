@@ -2,7 +2,6 @@ import { Colors } from "../theme/colors.slint";
 import { SidebarItem } from "sidebar-item.slint";
 
 export component Sidebar inherits Rectangle {
-
     callback home();
     callback quick_access();
     callback this_pc();
@@ -12,75 +11,62 @@ export component Sidebar inherits Rectangle {
     callback music();
     callback videos();
     callback network();
+    callback toggle();
 
     in property <string> current: "Home";
+    in property <bool> compact: false;
 
-    width: 210px;
-
+    width: compact ? 64px : 220px;
     background: Colors.sidebar;
+    border-width: 1px;
+    border-color: Colors.border;
 
     VerticalLayout {
-
-        spacing: 4px;
-
         padding: 10px;
+        spacing: 6px;
 
-        SidebarItem {
-            text: "🏠 Home";
-            selected: root.current == "Home";
-            clicked => { root.home(); }
-        }
+        Rectangle {
+            width: compact ? 44px : 196px;
+            height: 40px;
+            border-radius: 10px;
+            background: toggle_touch.has-hover ? #101d2d : Colors.sidebar;
 
-        SidebarItem {
-            text: "⭐ Quick Access";
-            selected: root.current == "Quick Access";
-            clicked => { root.quick_access(); }
-        }
+            toggle_touch := TouchArea {
+                clicked => { root.toggle(); }
+            }
 
-        SidebarItem {
-            text: "🖥 This PC";
-            selected: root.current == "This PC";
-            clicked => { root.this_pc(); }
-        }
+            HorizontalLayout {
+                padding-left: compact ? 0px : 12px;
+                padding-right: compact ? 0px : 12px;
+                spacing: 10px;
 
-        Rectangle { height: 8px; background: Colors.sidebar; }
-
-        SidebarItem {
-            text: "📄 Documents";
-            selected: root.current == "Documents";
-            clicked => { root.documents(); }
-        }
-
-        SidebarItem {
-            text: "⬇ Downloads";
-            selected: root.current == "Downloads";
-            clicked => { root.downloads(); }
-        }
-
-        SidebarItem {
-            text: "🖼 Pictures";
-            selected: root.current == "Pictures";
-            clicked => { root.pictures(); }
-        }
-
-        SidebarItem {
-            text: "🎵 Music";
-            selected: root.current == "Music";
-            clicked => { root.music(); }
-        }
-
-        SidebarItem {
-            text: "🎬 Videos";
-            selected: root.current == "Videos";
-            clicked => { root.videos(); }
+                Text {
+                    text: compact ? "☰" : "☰ Sidebar";
+                    color: Colors.text;
+                    vertical-alignment: center;
+                    horizontal-alignment: compact ? center : start;
+                }
+            }
         }
 
         Rectangle { height: 8px; background: Colors.sidebar; }
 
-        SidebarItem {
-            text: "🌐 Network";
-            selected: root.current == "Network";
-            clicked => { root.network(); }
-        }
+        SidebarItem { icon: "🏠"; text: "Home"; selected: root.current == "Home"; compact: root.compact; clicked => { root.home(); } }
+        SidebarItem { icon: "⭐"; text: "Quick Access"; selected: root.current == "Quick Access"; compact: root.compact; clicked => { root.quick_access(); } }
+        SidebarItem { icon: "🖥"; text: "This PC"; selected: root.current == "This PC"; compact: root.compact; clicked => { root.this_pc(); } }
+
+        Rectangle { height: 8px; background: Colors.sidebar; }
+
+        SidebarItem { icon: "📄"; text: "Documents"; selected: root.current == "Documents"; compact: root.compact; clicked => { root.documents(); } }
+        SidebarItem { icon: "⬇"; text: "Downloads"; selected: root.current == "Downloads"; compact: root.compact; clicked => { root.downloads(); } }
+        SidebarItem { icon: "🖼"; text: "Pictures"; selected: root.current == "Pictures"; compact: root.compact; clicked => { root.pictures(); } }
+        SidebarItem { icon: "🎵"; text: "Music"; selected: root.current == "Music"; compact: root.compact; clicked => { root.music(); } }
+        SidebarItem { icon: "🎬"; text: "Videos"; selected: root.current == "Videos"; compact: root.compact; clicked => { root.videos(); } }
+
+        Rectangle { height: 8px; background: Colors.sidebar; }
+
+        SidebarItem { icon: "🌐"; text: "Network"; selected: root.current == "Network"; compact: root.compact; clicked => { root.network(); } }
+
+        Rectangle { vertical-stretch: 1; background: Colors.sidebar; }
     }
 }
