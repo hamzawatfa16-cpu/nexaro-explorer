@@ -1,18 +1,19 @@
 import { Colors } from "../theme/colors.slint";
 
 export component SidebarItem inherits Rectangle {
-
+    in property <string> icon;
     in property <string> text;
     in property <bool> selected: false;
+    in property <bool> compact: false;
 
     callback clicked();
 
-    height: 38px;
-
-    border-radius: 8px;
+    width: compact ? 48px : 196px;
+    height: 40px;
+    border-radius: 10px;
 
     background: selected
-        ? #17304a
+        ? Colors.accent_soft
         : (touch.has-hover ? #101d2d : Colors.sidebar);
 
     touch := TouchArea {
@@ -20,12 +21,19 @@ export component SidebarItem inherits Rectangle {
     }
 
     HorizontalLayout {
-
-        padding-left: 12px;
-        padding-right: 12px;
+        padding-left: compact ? 0px : 12px;
+        padding-right: compact ? 0px : 12px;
         spacing: 10px;
 
         Text {
+            text: root.icon;
+            color: Colors.text;
+            width: 20px;
+            horizontal-alignment: center;
+            vertical-alignment: center;
+        }
+
+        if !root.compact : Text {
             text: root.text;
             color: Colors.text;
             vertical-alignment: center;
