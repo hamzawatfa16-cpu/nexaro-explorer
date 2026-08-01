@@ -127,6 +127,168 @@ fn main() {
         let controller = controller.clone();
         let window_weak = window.as_weak();
 
+        window.on_go_back(move || {
+            if let Some(window) = window_weak.upgrade() {
+                let mut controller = controller.borrow_mut();
+                controller.back();
+                if controller.refresh().is_ok() {
+                    load_files(&controller, &window);
+                }
+            }
+        });
+    }
+
+    {
+        let controller = controller.clone();
+        let window_weak = window.as_weak();
+
+        window.on_go_forward(move || {
+            if let Some(window) = window_weak.upgrade() {
+                let mut controller = controller.borrow_mut();
+                controller.forward();
+                if controller.refresh().is_ok() {
+                    load_files(&controller, &window);
+                }
+            }
+        });
+    }
+
+    {
+        let controller = controller.clone();
+        let window_weak = window.as_weak();
+
+        window.on_go_up(move || {
+            if let Some(window) = window_weak.upgrade() {
+                let mut controller = controller.borrow_mut();
+                controller.up();
+                if controller.refresh().is_ok() {
+                    load_files(&controller, &window);
+                }
+            }
+        });
+    }
+
+    {
+        let controller = controller.clone();
+        let window_weak = window.as_weak();
+
+        window.on_search_changed(move |query| {
+            if let Some(window) = window_weak.upgrade() {
+                let mut controller = controller.borrow_mut();
+                if controller.search(query.as_str()).is_ok() {
+                    load_files(&controller, &window);
+                }
+            }
+        });
+    }
+
+    {
+        let controller = controller.clone();
+        let window_weak = window.as_weak();
+
+        window.on_new_folder(move || {
+            if let Some(window) = window_weak.upgrade() {
+                let mut controller = controller.borrow_mut();
+                if let crate::models::location::ExplorerLocation::Folder(path) = &controller.state().location {
+                    let new_folder = path.join("New Folder");
+                    let _ = controller.create_folder(new_folder);
+                    if controller.refresh().is_ok() {
+                        load_files(&controller, &window);
+                    }
+                }
+            }
+        });
+    }
+
+    {
+        let controller = controller.clone();
+        let window_weak = window.as_weak();
+
+        window.on_rename_requested(move || {
+            if let Some(window) = window_weak.upgrade() {
+                let controller = controller.borrow();
+                if let Some(path) = controller.selected_files().first() {
+                    if let Some(name) = path.file_name().and_then(|n| n.to_str()) {
+                        window.set_rename_text(name.into());
+                        window.set_rename_visible(true);
+                    }
+                }
+            }
+        });
+    }
+
+    {
+        let controller = controller.clone();
+        let window_weak = window.as_weak();
+
+        window.on_rename_confirmed(move |name| {
+            if let Some(window) = window_weak.upgrade() {
+                let mut controller = controller.borrow_mut();
+                if let Some(old_path) = controller.selected_files().first().cloned() {
+                    let new_path = old_path.with_file_name(name.as_str());
+                    let _ = controller.rename(old_path, new_path);
+                    let _ = controller.refresh();
+                    load_files(&controller, &window);
+                }
+                window.set_rename_visible(false);
+            }
+        });
+    }
+
+    {
+        let window_weak = window.as_weak();
+        window.on_rename_cancelled(move || {
+            if let Some(window) = window_weak.upgrade() {
+                window.set_rename_visible(false);
+            }
+        });
+    }
+
+    {
+        let controller = controller.clone();
+        let window_weak = window.as_weak();
+
+        window.on_delete_selected(move || {
+            if let Some(window) = window_weak.upgrade() {
+                let controller = controller.borrow();
+                if let Some(path) = controller.selected_files().first() {
+                    if let Some(name) = path.file_name().and_then(|n| n.to_str()) {
+                        window.set_delete_name(name.into());
+                        window.set_delete_visible(true);
+                    }
+                }
+            }
+        });
+    }
+
+    {
+        let controller = controller.clone();
+        let window_weak = window.as_weak();
+
+        window.on_delete_confirmed(move || {
+            if let Some(window) = window_weak.upgrade() {
+                let mut controller = controller.borrow_mut();
+                let _ = controller.delete_selected();
+                let _ = controller.refresh();
+                load_files(&controller, &window);
+                window.set_delete_visible(false);
+            }
+        });
+    }
+
+    {
+        let window_weak = window.as_weak();
+        window.on_delete_cancelled(move || {
+            if let Some(window) = window_weak.upgrade() {
+                window.set_delete_visible(false);
+            }
+        });
+    }
+
+    {
+        let controller = controller.clone();
+        let window_weak = window.as_weak();
+
         window.on_breadcrumb_clicked(move |path| {
             if let Some(window) = window_weak.upgrade() {
                 let mut controller = controller.borrow_mut();
