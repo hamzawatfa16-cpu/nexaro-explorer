@@ -10,9 +10,7 @@ export struct UiFileItem {
 }
 
 export component FileList inherits Rectangle {
-
     in property <[UiFileItem]> files;
-
     in-out property <int> selected_index: -1;
 
     callback open_folder(path: string);
@@ -22,22 +20,24 @@ export component FileList inherits Rectangle {
     background: Colors.content;
 
     VerticalLayout {
+        spacing: 4px;
 
         Rectangle {
-            height: 36px;
+            height: 40px;
             background: Colors.toolbar;
+            border-radius: 10px;
 
             HorizontalLayout {
-
                 spacing: 0;
-                padding-left: 8px;
-                padding-right: 8px;
+                padding-left: 12px;
+                padding-right: 12px;
 
                 Text {
                     text: "Name";
                     color: Colors.text;
-                    width: 390px;
+                    width: 420px;
                     vertical-alignment: center;
+                    font-weight: 600;
                 }
 
                 Text {
@@ -45,6 +45,7 @@ export component FileList inherits Rectangle {
                     color: Colors.text;
                     width: 170px;
                     vertical-alignment: center;
+                    font-weight: 600;
                 }
 
                 Text {
@@ -52,28 +53,59 @@ export component FileList inherits Rectangle {
                     color: Colors.text;
                     width: 120px;
                     vertical-alignment: center;
+                    font-weight: 600;
                 }
 
                 Text {
                     text: "Modified";
                     color: Colors.text;
-                    width: 180px;
+                    width: 190px;
                     vertical-alignment: center;
+                    font-weight: 600;
+                }
+            }
+        }
+
+        if (root.files.length == 0) : Rectangle {
+            background: Colors.content;
+            border-radius: 12px;
+            border-width: 1px;
+            border-color: #1f2a3a;
+
+            VerticalLayout {
+                alignment: center;
+                spacing: 10px;
+
+                Text {
+                    text: "📁";
+                    color: Colors.text;
+                    font-size: 28px;
+                    horizontal-alignment: center;
+                }
+
+                Text {
+                    text: "This folder is empty";
+                    color: Colors.text;
+                    horizontal-alignment: center;
+                    font-weight: 600;
+                }
+
+                Text {
+                    text: "Create a folder or copy files here";
+                    color: Colors.text_secondary;
+                    horizontal-alignment: center;
                 }
             }
         }
 
         for file[i] in root.files : Rectangle {
-
-            height: 42px;
-
+            height: 46px;
             background: i == root.selected_index
                 ? #17304a
                 : (touch.has-hover ? #101d2d : Colors.content);
-
             border-width: 1px;
             border-color: i == root.selected_index ? #3b82f6 : #00000000;
-            border-radius: 8px;
+            border-radius: 10px;
 
             touch := TouchArea {
                 clicked => {
@@ -91,13 +123,12 @@ export component FileList inherits Rectangle {
             }
 
             HorizontalLayout {
-
                 spacing: 0;
-                padding-left: 8px;
-                padding-right: 8px;
+                padding-left: 12px;
+                padding-right: 12px;
 
                 Rectangle {
-                    width: 40px;
+                    width: 44px;
                     height: parent.height;
                     background: #00000000;
 
@@ -112,7 +143,7 @@ export component FileList inherits Rectangle {
                 Text {
                     text: file.name;
                     color: Colors.text;
-                    width: 350px;
+                    width: 376px;
                     vertical-alignment: center;
                     font-weight: 600;
                 }
@@ -134,7 +165,7 @@ export component FileList inherits Rectangle {
                 Text {
                     text: file.modified;
                     color: Colors.text;
-                    width: 180px;
+                    width: 190px;
                     vertical-alignment: center;
                 }
             }
