@@ -26,6 +26,7 @@ export component MainWindow inherits Window {
     callback go_back();
     callback go_forward();
     callback go_up();
+    callback refresh_requested();
 
     callback new_folder();
     callback open_documents();
@@ -56,6 +57,7 @@ export component MainWindow inherits Window {
             back => { root.go_back(); }
             forward => { root.go_forward(); }
             up => { root.go_up(); }
+            refresh => { root.refresh_requested(); }
             new_folder => { root.new_folder(); }
             rename => { root.rename_requested(); }
             delete_selected => { root.delete_selected(); }
