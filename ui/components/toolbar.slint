@@ -3,13 +3,11 @@ import { LineEdit } from "std-widgets.slint";
 import { UiBreadcrumb } from "../shared/breadcrumbs.slint";
 
 component ToolButton inherits Rectangle {
-
     in property <string> text;
     callback clicked();
 
     width: 34px;
     height: 34px;
-
     border-radius: 8px;
 
     background: touch.pressed
@@ -29,13 +27,11 @@ component ToolButton inherits Rectangle {
 }
 
 component ActionButton inherits Rectangle {
-
     in property <string> text;
     callback clicked();
 
     width: 88px;
     height: 34px;
-
     border-radius: 8px;
 
     background: touch.pressed
@@ -55,13 +51,13 @@ component ActionButton inherits Rectangle {
 }
 
 export component Toolbar inherits Rectangle {
-    
     in property <[UiBreadcrumb]> breadcrumbs;
     in property <string> current_path: "This PC";
 
     callback back();
     callback forward();
     callback up();
+    callback refresh();
     callback new_folder();
     callback rename();
     callback delete_selected();
@@ -72,27 +68,28 @@ export component Toolbar inherits Rectangle {
     background: Colors.toolbar;
 
     HorizontalLayout {
-
         padding-left: 12px;
         padding-right: 12px;
         spacing: 8px;
 
         ToolButton {
-         
             text: "←";
             clicked => { root.back(); }
         }
 
         ToolButton {
-        
             text: "→";
             clicked => { root.forward(); }
         }
 
         ToolButton {
-           
             text: "↑";
             clicked => { root.up(); }
+        }
+
+        ToolButton {
+            text: "⟳";
+            clicked => { root.refresh(); }
         }
 
         Rectangle {
@@ -102,19 +99,16 @@ export component Toolbar inherits Rectangle {
         }
 
         ActionButton {
-            
             text: "📁 New";
             clicked => { root.new_folder(); }
         }
 
         ActionButton {
-          
             text: "✏ Rename";
             clicked => { root.rename(); }
         }
 
         ActionButton {
-          
             text: "🗑 Delete";
             clicked => { root.delete_selected(); }
         }
@@ -126,23 +120,19 @@ export component Toolbar inherits Rectangle {
         }
 
         Rectangle {
-
             horizontal-stretch: 1;
             height: 36px;
-
             border-radius: 10px;
             background: #101826;
             border-width: 1px;
             border-color: #243041;
 
             HorizontalLayout {
-
                 padding-left: 12px;
                 padding-right: 12px;
                 spacing: 6px;
 
                 for crumb[i] in root.breadcrumbs : HorizontalLayout {
-
                     spacing: 6px;
 
                     Rectangle {
@@ -175,17 +165,14 @@ export component Toolbar inherits Rectangle {
         }
 
         Rectangle {
-
             width: 280px;
             height: 36px;
-
             border-radius: 10px;
             background: #101826;
             border-width: 1px;
             border-color: #243041;
 
             HorizontalLayout {
-
                 padding-left: 12px;
                 padding-right: 12px;
                 spacing: 8px;
@@ -200,7 +187,6 @@ export component Toolbar inherits Rectangle {
                 LineEdit {
                     horizontal-stretch: 1;
                     height: 20px;
-
                     placeholder-text: "Search files";
 
                     edited(text) => {
