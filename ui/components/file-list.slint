@@ -1,16 +1,18 @@
 import { Colors } from "../theme/colors.slint";
 
 export struct UiFileItem {
-    icon: string,
+    icon: image,
     name: string,
     path: string,
     file_type: string,
     size: string,
     modified: string,
+    is_directory: bool,
 }
 
 export component FileList inherits Rectangle {
     in property <[UiFileItem]> files;
+    in property <bool> dashboard: false;
     in-out property <int> selected_index: -1;
 
     callback open_folder(path: string);
@@ -21,8 +23,12 @@ export component FileList inherits Rectangle {
 
     VerticalLayout {
         spacing: 8px;
+        padding: 12px;
+        horizontal-stretch: 1;
+        vertical-stretch: 1;
 
         Rectangle {
+            visible: !root.dashboard;
             height: 44px;
             background: Colors.toolbar;
             border-radius: 12px;
@@ -72,126 +78,114 @@ export component FileList inherits Rectangle {
             }
         }
 
-        if (root.files.length == 0) : Rectangle {
-            background: Colors.content;
-            border-radius: 16px;
-            border-width: 1px;
-            border-color: Colors.border;
+        VerticalLayout {
+            vertical-stretch: 1;
+            spacing: 8px;
 
-            VerticalLayout {
-                alignment: center;
-                spacing: 12px;
-                padding: 24px;
+            if (root.files.length == 0) : Rectangle {
+                horizontal-stretch: 1;
+                background: Colors.toolbar;
+                border-radius: 18px;
+                border-width: 1px;
+                border-color: Colors.border;
 
-                Rectangle {
-                    width: 64px;
-                    height: 64px;
-                    border-radius: 20px;
-                    background: Colors.toolbar;
-                    border-width: 1px;
-                    border-color: Colors.border;
+                VerticalLayout {
+                    spacing: 10px;
+                    alignment: center;
+                    vertical-stretch: 1;
+                    horizontal-stretch: 1;
 
                     Text {
-                        text: "📁";
+                        text: root.dashboard ? "Nothing to show here" : "This folder is empty";
                         color: Colors.text;
                         horizontal-alignment: center;
-                        vertical-alignment: center;
-                        font-size: 28px;
+                        font-weight: 700;
+                        font-size: 16px;
                     }
-                }
-
-                Text {
-                    text: "This folder is empty";
-                    color: Colors.text;
-                    horizontal-alignment: center;
-                    font-weight: 700;
-                    font-size: 16px;
-                }
-
-                Text {
-                    text: "Create a folder or copy files here";
-                    color: Colors.text_secondary;
-                    horizontal-alignment: center;
-                }
-            }
-        }
-
-        for file[i] in root.files : Rectangle {
-            height: 52px;
-            background: i == root.selected_index
-                ? Colors.accent_soft
-                : (touch.has-hover ? Colors.toolbar : Colors.content);
-            border-width: 1px;
-            border-color: i == root.selected_index ? Colors.accent : #00000000;
-            border-radius: 12px;
-
-            touch := TouchArea {
-                clicked => {
-                    root.selected_index = i;
-                    root.select_file(file.path);
-                }
-
-                double-clicked => {
-                    if (file.file_type == "Directory") {
-                        root.open_folder(file.path);
-                    } else {
-                        root.open_file(file.path);
-                    }
-                }
-            }
-
-            HorizontalLayout {
-                spacing: 0;
-                padding-left: 14px;
-                padding-right: 14px;
-
-                Rectangle {
-                    width: 44px;
-                    height: parent.height;
-                    background: #00000000;
 
                     Text {
-                        text: file.icon;
-                        color: Colors.text;
+                        text: root.dashboard ? "Choose a sidebar item or open a folder." : "Create a folder or copy files here.";
+                        color: Colors.text_secondary;
                         horizontal-alignment: center;
-                        vertical-alignment: center;
-                        font-size: 18px;
+                    }
+                }
+            }
+
+            for file[i] in root.files : Rectangle {
+                horizontal-stretch: 1;
+                height: root.dashboard ? 84px : 52px;
+                background: i == root.selected_index
+                    ? Colors.accent_soft
+                    : (touch.has-hover ? Colors.toolbar : Colors.content);
+                border-width: 1px;
+                border-color: i == root.selected_index ? Colors.accent : #00000000;
+                border-radius: 12px;
+
+                touch := TouchArea {
+                    clicked => {
+                        root.selected_index = i;
+                        root.select_file(file.path);
+                    }
+
+                    double-clicked => {
+                        if (file.is_directory) {
+                            root.open_folder(file.path);
+                        } else {
+                            root.open_file(file.path);
+                        }
                     }
                 }
 
-                Text {
-                    text: file.name;
-                    color: Colors.text;
-                    width: 376px;
-                    vertical-alignment: center;
-                    font-weight: 600;
-                }
+                HorizontalLayout {
+                    spacing: 0;
+                    padding-left: 14px;
+                    padding-right: 14px;
 
-                Text {
-                    text: file.file_type;
-                    color: Colors.text_secondary;
-                    width: 170px;
-                    vertical-alignment: center;
-                }
+                    Rectangle {
+                        width: root.dashboard ? 64px : 44px;
+                        height: parent.height;
+                        background: #00000000;
 
-                Text {
-                    text: file.size;
-                    color: Colors.text_secondary;
-                    width: 120px;
-                    vertical-alignment: center;
-                }
+                        Image {
+                            source: file.icon;
+                            width: root.dashboard ? 40px : 24px;
+                            height: root.dashboard ? 40px : 24px;
+                            horizontal-alignment: center;
+                            vertical-alignment: center;
+                        }
+                    }
 
-                Text {
-                    text: file.modified;
-                    color: Colors.text_secondary;
-                    width: 190px;
-                    vertical-alignment: center;
+                    Text {
+                        text: file.name;
+                        color: Colors.text;
+                        width: root.dashboard ? 520px : 376px;
+                        vertical-alignment: center;
+                        font-weight: 600;
+                        font-size: root.dashboard ? 16px : 14px;
+                    }
+
+                    if (!root.dashboard) : Text {
+                        text: file.file_type;
+                        color: Colors.text_secondary;
+                        width: 170px;
+                        vertical-alignment: center;
+                    }
+
+                    if (!root.dashboard) : Text {
+                        text: file.size;
+                        color: Colors.text_secondary;
+                        width: 120px;
+                        vertical-alignment: center;
+                    }
+
+                    if (!root.dashboard) : Text {
+                        text: file.modified;
+                        color: Colors.text_secondary;
+                        width: 190px;
+                        vertical-alignment: center;
+                    }
                 }
             }
-        }
-
-        Rectangle {
-            background: Colors.content;
         }
     }
 }

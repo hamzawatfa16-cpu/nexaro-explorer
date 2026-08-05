@@ -13,7 +13,83 @@ pub struct ExplorerController {
 }
 
 impl ExplorerController {
+    pub fn open_home(&mut self) {
+        self.clear_selection();
+        let mut items = Vec::new();
+
+        let entries = [
+            ("Desktop", dirs::desktop_dir()),
+            ("Documents", dirs::document_dir()),
+            ("Downloads", dirs::download_dir()),
+            ("Pictures", dirs::picture_dir()),
+            ("Music", dirs::audio_dir()),
+            ("Videos", dirs::video_dir()),
+        ];
+
+        for (name, path_opt) in entries.iter() {
+            if let Some(path) = path_opt {
+                items.push(FileInfo {
+                    name: name.to_string(),
+                    path: path.clone(),
+                    file_type: crate::models::file_type::FileType::Directory,
+                    size: 0,
+                    modified: None,
+                    created: None,
+                    extension: None,
+                    is_hidden: false,
+                });
+            }
+        }
+
+        self.state
+            .set_location(crate::models::location::ExplorerLocation::Home);
+        self.state.set_files(items);
+    }
+
+    pub fn open_quick_access(&mut self) {
+        self.clear_selection();
+
+        let mut items = Vec::new();
+
+        let entries = [
+            ("Desktop", dirs::desktop_dir()),
+            ("Documents", dirs::document_dir()),
+            ("Downloads", dirs::download_dir()),
+            ("Pictures", dirs::picture_dir()),
+            ("Music", dirs::audio_dir()),
+            ("Videos", dirs::video_dir()),
+        ];
+
+        for (name, path_opt) in entries.iter() {
+            if let Some(path) = path_opt {
+                items.push(FileInfo {
+                    name: name.to_string(),
+                    path: path.clone(),
+                    file_type: crate::models::file_type::FileType::Directory,
+                    size: 0,
+                    modified: None,
+                    created: None,
+                    extension: None,
+                    is_hidden: false,
+                });
+            }
+        }
+
+        self.state
+            .set_location(crate::models::location::ExplorerLocation::QuickAccess);
+        self.state.set_files(items);
+    }
+
+    pub fn open_network(&mut self) {
+        self.clear_selection();
+        self.state
+            .set_location(crate::models::location::ExplorerLocation::Network);
+        self.state.set_files(Vec::new());
+    }
+
     pub fn open_this_pc(&mut self) {
+        self.clear_selection();
+
         let drives = DriveService::list_drives();
 
         self.state
@@ -80,6 +156,7 @@ impl ExplorerController {
     }
 
     pub fn open_folder(&mut self, path: PathBuf) {
+        self.clear_selection();
         self.explorer.open_folder(path);
     }
 

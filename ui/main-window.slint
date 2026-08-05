@@ -8,10 +8,12 @@ import { LineEdit } from "std-widgets.slint";
 
 export component MainWindow inherits Window {
     in property <[UiFileItem]> files;
+    in property <bool> file_list_dashboard: false;
     in property <string> current_path: "This PC";
     in property <[UiBreadcrumb]> breadcrumbs;
     in-out property <string> sidebar_current: "Home";
     in-out property <bool> sidebar_compact: false;
+    in-out property <int> file_list_selected_index: -1;
     in property <int> selected_count: 0;
     in-out property <bool> rename_visible: false;
     in-out property <string> rename_text: "";
@@ -19,6 +21,10 @@ export component MainWindow inherits Window {
     in-out property <string> delete_name: "";
 
     callback open_this_pc();
+    callback open_home();
+    callback open_desktop();
+    callback open_quick_access();
+    callback open_network();
     callback open_folder(path: string);
     callback open_file(path: string);
     callback toggle_sidebar();
@@ -72,12 +78,23 @@ export component MainWindow inherits Window {
 
                 toggle => { root.toggle_sidebar(); }
 
-                home => { root.sidebar_current = "Home"; }
-                quick_access => { root.sidebar_current = "Quick Access"; }
+                home => {
+                    root.sidebar_current = "Home";
+                    root.open_home();
+                }
+                quick_access => {
+                    root.sidebar_current = "Quick Access";
+                    root.open_quick_access();
+                }
 
                 this_pc => {
                     root.sidebar_current = "This PC";
                     root.open_this_pc();
+                }
+
+                desktop => {
+                    root.sidebar_current = "Desktop";
+                    root.open_desktop();
                 }
 
                 documents => {
@@ -107,11 +124,16 @@ export component MainWindow inherits Window {
 
                 network => {
                     root.sidebar_current = "Network";
+                    root.open_network();
                 }
             }
 
             FileList {
                 files: root.files;
+                dashboard: root.file_list_dashboard;
+                selected_index: root.file_list_selected_index;
+                horizontal-stretch: 1;
+                vertical-stretch: 1;
 
                 select_file(path) => { root.select_file(path); }
                 open_folder(path) => { root.open_folder(path); }

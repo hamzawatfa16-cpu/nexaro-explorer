@@ -5,6 +5,7 @@ export component Sidebar inherits Rectangle {
     callback home();
     callback quick_access();
     callback this_pc();
+    callback desktop();
     callback documents();
     callback downloads();
     callback pictures();
@@ -41,31 +42,33 @@ export component Sidebar inherits Rectangle {
                 spacing: 10px;
 
                 Text {
-                    text: compact ? "☰" : "☰ Sidebar";
+                    text: compact ? "Menu" : "Toggle Sidebar";
                     color: Colors.text;
                     vertical-alignment: center;
                     horizontal-alignment: compact ? center : start;
+                    font-weight: 600;
                 }
             }
         }
 
         Rectangle { height: 8px; background: Colors.sidebar; }
 
-        SidebarItem { icon: "🏠"; text: "Home"; selected: root.current == "Home"; compact: root.compact; clicked => { root.home(); } }
-        SidebarItem { icon: "⭐"; text: "Quick Access"; selected: root.current == "Quick Access"; compact: root.compact; clicked => { root.quick_access(); } }
-        SidebarItem { icon: "🖥"; text: "This PC"; selected: root.current == "This PC"; compact: root.compact; clicked => { root.this_pc(); } }
+        SidebarItem { icon: "H"; text: "Home"; selected: root.current == "Home"; compact: root.compact; clicked => { root.home(); } }
+        SidebarItem { icon: "QA"; text: "Quick Access"; selected: root.current == "Quick Access"; compact: root.compact; clicked => { root.quick_access(); } }
+        SidebarItem { icon: "PC"; text: "This PC"; selected: root.current == "This PC"; compact: root.compact; clicked => { root.this_pc(); } }
+        SidebarItem { icon: "D"; text: "Desktop"; selected: root.current == "Desktop"; compact: root.compact; clicked => { root.desktop(); } }
 
         Rectangle { height: 8px; background: Colors.sidebar; }
 
-        SidebarItem { icon: "📄"; text: "Documents"; selected: root.current == "Documents"; compact: root.compact; clicked => { root.documents(); } }
-        SidebarItem { icon: "⬇"; text: "Downloads"; selected: root.current == "Downloads"; compact: root.compact; clicked => { root.downloads(); } }
-        SidebarItem { icon: "🖼"; text: "Pictures"; selected: root.current == "Pictures"; compact: root.compact; clicked => { root.pictures(); } }
-        SidebarItem { icon: "🎵"; text: "Music"; selected: root.current == "Music"; compact: root.compact; clicked => { root.music(); } }
-        SidebarItem { icon: "🎬"; text: "Videos"; selected: root.current == "Videos"; compact: root.compact; clicked => { root.videos(); } }
+        SidebarItem { icon: "Doc"; text: "Documents"; selected: root.current == "Documents"; compact: root.compact; clicked => { root.documents(); } }
+        SidebarItem { icon: "DL"; text: "Downloads"; selected: root.current == "Downloads"; compact: root.compact; clicked => { root.downloads(); } }
+        SidebarItem { icon: "Pic"; text: "Pictures"; selected: root.current == "Pictures"; compact: root.compact; clicked => { root.pictures(); } }
+        SidebarItem { icon: "M"; text: "Music"; selected: root.current == "Music"; compact: root.compact; clicked => { root.music(); } }
+        SidebarItem { icon: "V"; text: "Videos"; selected: root.current == "Videos"; compact: root.compact; clicked => { root.videos(); } }
 
         Rectangle { height: 8px; background: Colors.sidebar; }
 
-        SidebarItem { icon: "🌐"; text: "Network"; selected: root.current == "Network"; compact: root.compact; clicked => { root.network(); } }
+        SidebarItem { icon: "Net"; text: "Network"; selected: root.current == "Network"; compact: root.compact; clicked => { root.network(); } }
 
         Rectangle { vertical-stretch: 1; background: Colors.sidebar; }
     }

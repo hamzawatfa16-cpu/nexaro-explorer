@@ -25,17 +25,28 @@ fn load_files(controller: &ExplorerController, window: &MainWindow) {
             file_type: f.file_type.into(),
             size: f.size.into(),
             modified: f.modified.into(),
-            icon: f.icon.into(),
+            icon: f.icon,
+            is_directory: f.is_directory,
         })
         .collect();
 
     window.set_files(ui_files.as_slice().into());
     window.set_selected_count(controller.selected_files().len() as i32);
+    window.set_file_list_selected_index(-1);
+
+    window.set_file_list_dashboard(matches!(
+        controller.state().location,
+        crate::models::location::ExplorerLocation::Home
+            | crate::models::location::ExplorerLocation::ThisPc
+            | crate::models::location::ExplorerLocation::QuickAccess
+            | crate::models::location::ExplorerLocation::Network
+    ));
 
     window.set_current_path(match &controller.state().location {
         crate::models::location::ExplorerLocation::Folder(path) => {
             path.to_string_lossy().to_string().into()
         }
+        crate::models::location::ExplorerLocation::Home => "Home".into(),
         crate::models::location::ExplorerLocation::ThisPc => "This PC".into(),
         crate::models::location::ExplorerLocation::QuickAccess => "Quick Access".into(),
         crate::models::location::ExplorerLocation::Network => "Network".into(),
@@ -56,6 +67,17 @@ fn load_files(controller: &ExplorerController, window: &MainWindow) {
             window.set_breadcrumbs(ui_crumbs.as_slice().into());
         }
 
+        crate::models::location::ExplorerLocation::Home => {
+            window.set_breadcrumbs(
+                vec![UiBreadcrumb {
+                    label: "Home".into(),
+                    path: "Home".into(),
+                }]
+                .as_slice()
+                .into(),
+            );
+        }
+
         crate::models::location::ExplorerLocation::ThisPc => {
             window.set_breadcrumbs(
                 vec![UiBreadcrumb {
@@ -67,7 +89,27 @@ fn load_files(controller: &ExplorerController, window: &MainWindow) {
             );
         }
 
-        _ => {}
+        crate::models::location::ExplorerLocation::QuickAccess => {
+            window.set_breadcrumbs(
+                vec![UiBreadcrumb {
+                    label: "Quick Access".into(),
+                    path: "Quick Access".into(),
+                }]
+                .as_slice()
+                .into(),
+            );
+        }
+
+        crate::models::location::ExplorerLocation::Network => {
+            window.set_breadcrumbs(
+                vec![UiBreadcrumb {
+                    label: "Network".into(),
+                    path: "Network".into(),
+                }]
+                .as_slice()
+                .into(),
+            );
+        }
     }
 }
 
@@ -91,9 +133,9 @@ fn open_special_folder(
 fn main() {
     let controller = Rc::new(RefCell::new(ExplorerController::new(PathBuf::from("."))));
 
-    if let Err(e) = controller.borrow_mut().refresh() {
-        eprintln!("Refresh failed: {:?}", e);
-        return;
+    {
+        let mut controller = controller.borrow_mut();
+        controller.open_home();
     }
 
     let window = MainWindow::new().unwrap();
@@ -119,6 +161,14 @@ fn main() {
                 controller.clear_selection();
                 controller.select_file(PathBuf::from(path.as_str()));
                 window.set_selected_count(controller.selected_files().len() as i32);
+
+                let selected_index = controller
+                    .files()
+                    .iter()
+                    .position(|file| path == file.path.to_string_lossy())
+                    .map(|index| index as i32)
+                    .unwrap_or(-1);
+                window.set_file_list_selected_index(selected_index);
             }
         });
     }
@@ -161,6 +211,20 @@ fn main() {
             if let Some(window) = window_weak.upgrade() {
                 let mut controller = controller.borrow_mut();
                 controller.up();
+                if controller.refresh().is_ok() {
+                    load_files(&controller, &window);
+                }
+            }
+        });
+    }
+
+    {
+        let controller = controller.clone();
+        let window_weak = window.as_weak();
+
+        window.on_refresh_requested(move || {
+            if let Some(window) = window_weak.upgrade() {
+                let mut controller = controller.borrow_mut();
                 if controller.refresh().is_ok() {
                     load_files(&controller, &window);
                 }
@@ -293,14 +357,18 @@ fn main() {
             if let Some(window) = window_weak.upgrade() {
                 let mut controller = controller.borrow_mut();
 
-                if path == "This PC" {
-                    controller.open_this_pc();
-                } else {
-                    controller.open_folder(PathBuf::from(path.as_str()));
+                match path.as_str() {
+                    "Home" => controller.open_home(),
+                    "Quick Access" => controller.open_quick_access(),
+                    "This PC" => controller.open_this_pc(),
+                    "Network" => controller.open_network(),
+                    _ => {
+                        controller.open_folder(PathBuf::from(path.as_str()));
 
-                    if let Err(e) = controller.refresh() {
-                        eprintln!("Breadcrumb navigation failed: {:?}", e);
-                        return;
+                        if let Err(e) = controller.refresh() {
+                            eprintln!("Breadcrumb navigation failed: {:?}", e);
+                            return;
+                        }
                     }
                 }
 
@@ -317,6 +385,58 @@ fn main() {
             if let Some(window) = window_weak.upgrade() {
                 let mut controller = controller.borrow_mut();
                 controller.open_this_pc();
+                load_files(&controller, &window);
+            }
+        });
+    }
+
+    {
+        let controller = controller.clone();
+        let window_weak = window.as_weak();
+
+        window.on_open_home(move || {
+            if let Some(window) = window_weak.upgrade() {
+                let mut controller = controller.borrow_mut();
+                controller.open_home();
+                load_files(&controller, &window);
+            }
+        });
+    }
+
+    {
+        let controller = controller.clone();
+        let window_weak = window.as_weak();
+
+        window.on_open_desktop(move || {
+            if let Some(window) = window_weak.upgrade() {
+                if let Some(path) = dirs::desktop_dir() {
+                    open_special_folder(&controller, &window, path);
+                }
+            }
+        });
+    }
+
+    {
+        let controller = controller.clone();
+        let window_weak = window.as_weak();
+
+        window.on_open_quick_access(move || {
+            if let Some(window) = window_weak.upgrade() {
+                let mut controller = controller.borrow_mut();
+                controller.open_quick_access();
+                load_files(&controller, &window);
+            }
+        });
+    }
+
+    {
+        let controller = controller.clone();
+        let window_weak = window.as_weak();
+
+        window.on_open_network(move || {
+            if let Some(window) = window_weak.upgrade() {
+                let mut controller = controller.borrow_mut();
+                controller.open_network();
                 load_files(&controller, &window);
             }
         });

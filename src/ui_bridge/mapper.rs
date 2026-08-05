@@ -1,4 +1,5 @@
 use crate::models::file_info::FileInfo;
+use crate::platform::icon::icon_for_file;
 use crate::ui_bridge::file_item::FileItem;
 use crate::models::file_type::FileType;
 use chrono::{DateTime, Local};
@@ -40,88 +41,41 @@ fn format_modified(
 }
 
 
-fn get_icon(
-    file: &FileInfo,
-) -> String {
-
-    match file.file_type {
-
-       FileType::Directory => {
-            "📁".to_string()
+fn file_type_label(file: &FileInfo) -> String {
+    if file.file_type == FileType::Directory {
+        "Folder".to_string()
+    } else if let Some(extension) = file.extension.as_ref() {
+        match extension.to_lowercase().as_str() {
+            "lnk" => "Shortcut".to_string(),
+            "exe" => "Application".to_string(),
+            "url" => "Link".to_string(),
+            "msi" => "Installer".to_string(),
+            other => other.to_uppercase(),
         }
-
-
-        _ => {
-
-            match file
-                .name
-                .split('.')
-                .last()
-                .unwrap_or("")
-            {
-
-                "png" | "jpg" | "jpeg" | "gif" => {
-                    "🖼".to_string()
-                }
-
-
-                "mp3" | "wav" | "flac" => {
-                    "🎵".to_string()
-                }
-
-
-                "mp4" | "mkv" | "avi" => {
-                    "🎬".to_string()
-                }
-
-
-                "rs" | "cpp" | "py" | "js" | "ts" => {
-                    "💻".to_string()
-                }
-
-
-                "txt" | "md" => {
-                    "📄".to_string()
-                }
-
-
-                _ => {
-                    "📄".to_string()
-                }
-            }
-        }
+    } else {
+        "File".to_string()
     }
 }
-
 
 pub fn map_file(
     file: &FileInfo,
 ) -> FileItem {
-
     FileItem {
-
         name: file.name.clone(),
-
         path: file.path
             .to_string_lossy()
             .to_string(),
-
-        file_type: format!("{:?}", file.file_type),
-
+        file_type: file_type_label(file),
         size: format_size(file.size),
-
         modified: format_modified(file.modified),
-
-        icon: get_icon(file),
+        icon: icon_for_file(&file.path, file.file_type == FileType::Directory),
+        is_directory: file.file_type == FileType::Directory,
     }
 }
-
-
 
 pub fn map_files(
     files: &[FileInfo],
 ) -> Vec<FileItem> {
-
     files
         .iter()
         .map(map_file)

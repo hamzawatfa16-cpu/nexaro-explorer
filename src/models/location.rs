@@ -6,6 +6,8 @@ pub enum ExplorerLocation {
 
     Folder(PathBuf),
 
+    Home,
+
     ThisPc,
 
     QuickAccess,
