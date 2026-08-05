@@ -6,13 +6,15 @@ component ToolButton inherits Rectangle {
     in property <string> text;
     callback clicked();
 
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border-width: 1px;
+    border-color: touch.has-hover ? #2f4056 : Colors.border;
 
     background: touch.pressed
         ? #17304a
-        : (touch.has-hover ? #101d2d : Colors.toolbar);
+        : (touch.has-hover ? #111c2a : Colors.content);
 
     touch := TouchArea {
         clicked => { root.clicked(); }
@@ -23,6 +25,8 @@ component ToolButton inherits Rectangle {
         color: Colors.text;
         horizontal-alignment: center;
         vertical-alignment: center;
+        font-size: 15px;
+        font-weight: 600;
     }
 }
 
@@ -30,13 +34,15 @@ component ActionButton inherits Rectangle {
     in property <string> text;
     callback clicked();
 
-    width: 88px;
-    height: 34px;
-    border-radius: 8px;
+    height: 36px;
+    min-width: 92px;
+    border-radius: 10px;
+    border-width: 1px;
+    border-color: touch.has-hover ? #2f4056 : Colors.border;
 
     background: touch.pressed
         ? #17304a
-        : (touch.has-hover ? #101d2d : Colors.toolbar);
+        : (touch.has-hover ? #111c2a : Colors.content);
 
     touch := TouchArea {
         clicked => { root.clicked(); }
@@ -47,6 +53,7 @@ component ActionButton inherits Rectangle {
         color: Colors.text;
         horizontal-alignment: center;
         vertical-alignment: center;
+        font-weight: 600;
     }
 }
 
@@ -64,133 +71,145 @@ export component Toolbar inherits Rectangle {
     callback search_changed(query: string);
     callback breadcrumb_clicked(path: string);
 
-    height: 52px;
-    background: Colors.toolbar;
+    height: 68px;
+    background: Colors.background;
 
-    HorizontalLayout {
-        padding-left: 12px;
-        padding-right: 12px;
-        spacing: 8px;
+    Rectangle {
+        x: 12px;
+        y: 10px;
+        width: parent.width - 24px;
+        height: 48px;
+        border-radius: 16px;
+        background: Colors.toolbar;
+        border-width: 1px;
+        border-color: Colors.border;
 
-        ToolButton {
-            text: "←";
-            clicked => { root.back(); }
-        }
+        HorizontalLayout {
+            padding-left: 12px;
+            padding-right: 12px;
+            spacing: 8px;
 
-        ToolButton {
-            text: "→";
-            clicked => { root.forward(); }
-        }
+            ToolButton {
+                text: "←";
+                clicked => { root.back(); }
+            }
 
-        ToolButton {
-            text: "↑";
-            clicked => { root.up(); }
-        }
+            ToolButton {
+                text: "→";
+                clicked => { root.forward(); }
+            }
 
-        ToolButton {
-            text: "⟳";
-            clicked => { root.refresh(); }
-        }
+            ToolButton {
+                text: "↑";
+                clicked => { root.up(); }
+            }
 
-        Rectangle {
-            width: 1px;
-            height: 24px;
-            background: #2a3547;
-        }
+            ToolButton {
+                text: "⟳";
+                clicked => { root.refresh(); }
+            }
 
-        ActionButton {
-            text: "📁 New";
-            clicked => { root.new_folder(); }
-        }
+            Rectangle {
+                width: 1px;
+                height: 22px;
+                background: Colors.border;
+            }
 
-        ActionButton {
-            text: "✏ Rename";
-            clicked => { root.rename(); }
-        }
+            ActionButton {
+                text: "📁 New";
+                clicked => { root.new_folder(); }
+            }
 
-        ActionButton {
-            text: "🗑 Delete";
-            clicked => { root.delete_selected(); }
-        }
+            ActionButton {
+                text: "✏ Rename";
+                clicked => { root.rename(); }
+            }
 
-        Rectangle {
-            width: 1px;
-            height: 24px;
-            background: #2a3547;
-        }
+            ActionButton {
+                text: "🗑 Delete";
+                clicked => { root.delete_selected(); }
+            }
 
-        Rectangle {
-            horizontal-stretch: 1;
-            height: 36px;
-            border-radius: 10px;
-            background: #101826;
-            border-width: 1px;
-            border-color: #243041;
+            Rectangle {
+                width: 1px;
+                height: 22px;
+                background: Colors.border;
+            }
 
-            HorizontalLayout {
-                padding-left: 12px;
-                padding-right: 12px;
-                spacing: 6px;
+            Rectangle {
+                horizontal-stretch: 1;
+                height: 36px;
+                border-radius: 12px;
+                background: Colors.content;
+                border-width: 1px;
+                border-color: Colors.border;
 
-                for crumb[i] in root.breadcrumbs : HorizontalLayout {
+                HorizontalLayout {
+                    padding-left: 10px;
+                    padding-right: 10px;
                     spacing: 6px;
 
-                    Rectangle {
-                        height: 24px;
-                        border-radius: 6px;
-                        background: touch.has-hover ? #17304a : #101826;
+                    for crumb[i] in root.breadcrumbs : HorizontalLayout {
+                        spacing: 6px;
 
-                        touch := TouchArea {
-                            clicked => {
-                                root.breadcrumb_clicked(crumb.path);
+                        Rectangle {
+                            height: 26px;
+                            border-radius: 8px;
+                            background: touch.has-hover ? #142235 : Colors.content;
+
+                            touch := TouchArea {
+                                clicked => {
+                                    root.breadcrumb_clicked(crumb.path);
+                                }
+                            }
+
+                            Text {
+                                text: crumb.label;
+                                color: Colors.text;
+                                vertical-alignment: center;
+                                font-weight: 600;
+                                x: 10px;
+                                width: parent.width - 20px;
                             }
                         }
 
-                        Text {
-                            text: crumb.label;
-                            color: Colors.text;
+                        if i < root.breadcrumbs.length - 1 : Text {
+                            text: "›";
+                            color: Colors.text_secondary;
                             vertical-alignment: center;
-                            x: 8px;
-                            width: parent.width - 16px;
                         }
-                    }
-
-                    if i < root.breadcrumbs.length - 1 : Text {
-                        text: "›";
-                        color: Colors.text;
-                        vertical-alignment: center;
                     }
                 }
             }
-        }
 
-        Rectangle {
-            width: 280px;
-            height: 36px;
-            border-radius: 10px;
-            background: #101826;
-            border-width: 1px;
-            border-color: #243041;
+            Rectangle {
+                width: 260px;
+                height: 36px;
+                border-radius: 12px;
+                background: Colors.content;
+                border-width: 1px;
+                border-color: Colors.border;
 
-            HorizontalLayout {
-                padding-left: 12px;
-                padding-right: 12px;
-                spacing: 8px;
+                HorizontalLayout {
+                    padding-left: 10px;
+                    padding-right: 10px;
+                    spacing: 8px;
 
-                Text {
-                    text: "🔍";
-                    color: Colors.text;
-                    vertical-alignment: center;
-                    width: 16px;
-                }
+                    Text {
+                        text: "🔍";
+                        color: Colors.text_secondary;
+                        vertical-alignment: center;
+                        width: 16px;
+                    }
 
-                LineEdit {
-                    horizontal-stretch: 1;
-                    height: 20px;
-                    placeholder-text: "Search files";
+                    LineEdit {
+                        horizontal-stretch: 1;
+                        height: 20px;
+                        placeholder-text: "Search files";
 
-                    edited(text) => {
-                        root.search_changed(text);
+                        edited(text) => {
+                            root.search_changed(text);
+                        }
                     }
                 }
             }
