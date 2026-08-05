@@ -31,6 +31,8 @@ export component Sidebar inherits Rectangle {
             height: 40px;
             border-radius: 10px;
             background: toggle_touch.has-hover ? #101d2d : Colors.sidebar;
+            border-width: 1px;
+            border-color: Colors.border;
 
             toggle_touch := TouchArea {
                 clicked => { root.toggle(); }

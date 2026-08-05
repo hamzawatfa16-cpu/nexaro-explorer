@@ -23,14 +23,14 @@ export component FileList inherits Rectangle {
 
     VerticalLayout {
         spacing: 8px;
-        padding: 12px;
+        padding: 16px;
         horizontal-stretch: 1;
         vertical-stretch: 1;
 
         Rectangle {
             visible: !root.dashboard;
             height: 44px;
-            background: Colors.toolbar;
+            background: Colors.content_soft;
             border-radius: 12px;
             border-width: 1px;
             border-color: Colors.border;
@@ -46,7 +46,8 @@ export component FileList inherits Rectangle {
                     width: 420px;
                     vertical-alignment: center;
                     font-weight: 600;
-                    font-size: 13px;
+                    font-size: 12px;
+                    letter-spacing: 0.5px;
                 }
 
                 Text {
@@ -55,7 +56,8 @@ export component FileList inherits Rectangle {
                     width: 170px;
                     vertical-alignment: center;
                     font-weight: 600;
-                    font-size: 13px;
+                    font-size: 12px;
+                    letter-spacing: 0.5px;
                 }
 
                 Text {
@@ -116,10 +118,10 @@ export component FileList inherits Rectangle {
                 height: root.dashboard ? 84px : 52px;
                 background: i == root.selected_index
                     ? Colors.accent_soft
-                    : (touch.has-hover ? Colors.toolbar : Colors.content);
+                    : (touch.has-hover ? Colors.row_hover : Colors.content);
                 border-width: 1px;
                 border-color: i == root.selected_index ? Colors.accent : #00000000;
-                border-radius: 12px;
+                border-radius: 14px;
 
                 touch := TouchArea {
                     clicked => {

@@ -15,6 +15,8 @@ export component SidebarItem inherits Rectangle {
     background: selected
         ? Colors.accent_soft
         : (touch.has-hover ? #101d2d : Colors.sidebar);
+    border-width: selected ? 1px : 0px;
+    border-color: selected ? Colors.accent : #00000000;
 
     touch := TouchArea {
         clicked => { root.clicked(); }
@@ -30,6 +32,7 @@ export component SidebarItem inherits Rectangle {
             color: Colors.text;
             width: 28px;
             font-weight: 700;
+            font-size: 14px;
             horizontal-alignment: center;
             vertical-alignment: center;
         }
@@ -38,6 +41,7 @@ export component SidebarItem inherits Rectangle {
             text: root.text;
             color: Colors.text;
             vertical-alignment: center;
+            font-size: 14px;
         }
     }
 }
